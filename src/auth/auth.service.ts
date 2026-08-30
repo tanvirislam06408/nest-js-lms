@@ -6,8 +6,8 @@ import bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UserService) {}
+
   async registerUser(registerUserDto: registerDto) {
-    console.log(registerUserDto);
     const saltOrRounds = 10;
     const hash = await bcrypt.hash(registerUserDto.password, saltOrRounds);
     // logic for user register
@@ -19,10 +19,12 @@ export class AuthService {
     5. send token into response
 
     */
-    const result = this.userService.createUser({
+    const user = await this.userService.createUser({
       ...registerUserDto,
       password: hash,
     });
-    return result;
+    console.log(user);
+
+    return {};
   }
 }

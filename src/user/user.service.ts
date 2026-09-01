@@ -34,4 +34,8 @@ export class UserService {
       throw new ConflictException('Login Failed');
     }
   }
+
+  async getOneUserId(id: string) {
+    return await this.userModel.findOne({ _id: id }).select('-password');
+  }
 }

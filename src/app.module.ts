@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
+import { CourseModule } from './course/course.module';
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -20,6 +21,7 @@ if (!databaseUrl) {
     UserModule,
     MongooseModule.forRoot(databaseUrl),
     ConfigModule.forRoot(),
+    CourseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

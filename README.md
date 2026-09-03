@@ -1,98 +1,138 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS LMS API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A learning management system API built with NestJS, TypeScript, MongoDB, and Mongoose. The API supports user registration and login, JWT authentication, role-based course creation, and course management.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- User registration with bcrypt password hashing
+- JWT-based login and protected profile access
+- Role-based authorization for course creation
+- Course create, read, update, and delete endpoints
+- DTO validation with NestJS `ValidationPipe`
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Requirements
 
-## Project setup
+- Node.js 20 or later
+- pnpm
+- MongoDB running locally or a MongoDB connection string
 
-```bash
-$ pnpm install
+## Setup
+
+1. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Create a `.env` file in the project root:
+
+   ```env
+   DATABASE_URL=mongodb://127.0.0.1:27017/nest-js-lms
+   JWT_SECRET=replace-with-a-long-random-secret
+   PORT=3000
+   ```
+
+   `DATABASE_URL` is required. `PORT` defaults to `3000` when it is not set.
+
+3. Start the API:
+
+   ```bash
+   pnpm start:dev
+   ```
+
+The API is available at `http://localhost:3000`.
+
+## Available Scripts
+
+| Command | Description |
+| --- | --- |
+| `pnpm start` | Start the application |
+| `pnpm start:dev` | Start in watch mode |
+| `pnpm start:prod` | Run the compiled application |
+| `pnpm build` | Compile the project |
+| `pnpm test` | Run unit tests |
+| `pnpm test:e2e` | Run end-to-end tests |
+| `pnpm test:cov` | Run tests with coverage |
+| `pnpm lint` | Lint and automatically fix files |
+
+## API Endpoints
+
+### Authentication
+
+#### Register
+
+`POST /auth/register`
+
+```json
+{
+  "fname": "Ada",
+  "lname": "Lovelace",
+  "email": "ada@example.com",
+  "password": "strong-password",
+  "role": "Student"
+}
 ```
 
-## Compile and run the project
+Returns an access token. Supported roles are `Student`, `Teacher`, and `Admin`. New users default to `Student` when no role is provided.
 
-```bash
-# development
-$ pnpm run start
+#### Login
 
-# watch mode
-$ pnpm run start:dev
+`POST /auth/login`
 
-# production mode
-$ pnpm run start:prod
+```json
+{
+  "email": "ada@example.com",
+  "password": "strong-password"
+}
 ```
 
-## Run tests
+Use the returned token in protected requests:
 
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+```http
+Authorization: Bearer <access-token>
 ```
 
-## Deployment
+#### Profile
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+`GET /auth/profile` requires a valid bearer token.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Courses
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+`GET /courses` and `GET /courses/:id` are public read endpoints.
+
+`POST /courses` requires a valid bearer token and the `Admin` role:
+
+```json
+{
+  "name": "Introduction to TypeScript",
+  "des": "Learn the fundamentals of TypeScript.",
+  "lavel": "Beginner",
+  "price": 49.99
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+`PATCH /courses/:id` updates a course, and `DELETE /courses/:id` removes one. Course update and delete authorization currently follows the controller implementation.
 
-## Resources
+## Project Structure
 
-Check out a few resources that may come in handy when working with NestJS:
+```text
+src/
+  auth/       Registration, login, JWT, and role guards
+  course/     Course controller, service, DTOs, and entity
+  user/       User service, schema, and role types
+  main.ts     Application bootstrap and request validation
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Testing
 
-## Support
+Run the test suite with:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+pnpm test
+```
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+The end-to-end tests require the application dependencies and a working test environment.
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is private and is not currently published under an open-source license.

@@ -3,12 +3,20 @@ import { CourseService } from './course.service';
 import { CourseController } from './course.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Course, CourseSchema } from './entities/course.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Course.name, schema: CourseSchema }]),
   ],
   controllers: [CourseController],
-  providers: [CourseService],
+  providers: [
+    CourseService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class CourseModule {}

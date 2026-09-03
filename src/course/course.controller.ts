@@ -12,12 +12,15 @@ import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { AuthGuard } from 'src/auth/auth.grud';
+import { Roles } from 'src/auth/roles.decorator';
+import { UserRole } from 'src/user/user.types';
 
 @Controller('courses')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @UseGuards(AuthGuard)
+  @Roles(UserRole.Admin)
   @Post()
   create(@Body() createCourseDto: CreateCourseDto) {
     return this.courseService.create(createCourseDto);

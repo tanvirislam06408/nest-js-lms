@@ -16,12 +16,14 @@ export class CourseService {
     });
   }
 
-  findAll() {
-    return `This action returns all course`;
+  async findAll() {
+    const allCourses = await this.courseModel.find();
+    return allCourses;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
+  async findOne(id: string) {
+    const findCourse = await this.courseModel.findById(id);
+    return findCourse;
   }
 
   update(id: number, updateCourseDto: UpdateCourseDto) {
